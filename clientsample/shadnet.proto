@@ -175,6 +175,8 @@ message GetScoreResponse {
 
 // ── Matching ──────────────────────────────────────────────────────────────────
 
+// Shared attribute types
+
 message MatchingBinAttr {
     uint32 attr_id = 1;
     bytes  data    = 2;
@@ -199,6 +201,8 @@ message MatchingCallbackEntry {
     uint64 callback_addr = 2;
     uint64 callback_arg  = 3;
 }
+
+// Room data structures
 
 message MatchingRoomDataInternal {
     uint32                   public_slots       = 1;
@@ -254,6 +258,8 @@ message CreateJoinRoomResponse {
     uint32                          owner_member_id = 4;
 }
 
+// Command requests
+
 message RegisterHandlersRequest {
     string addr          = 1;
     uint32 port          = 2;
@@ -295,8 +301,14 @@ message JoinRoomRequest {
     bool   join_group_label_present = 8;
 }
 
-message LeaveRoomRequest        { uint64 room_id = 1; uint32 req_id = 2; }
-message RequestSignalingInfosRequest { string target_npid = 1; }
+message LeaveRoomRequest {
+    uint64 room_id = 1;
+    uint32 req_id  = 2;
+}
+
+message RequestSignalingInfosRequest {
+    string target_npid = 1;
+}
 
 message SetRoomDataInternalRequest {
     uint32 req_id           = 1;
@@ -323,6 +335,8 @@ message KickoutRoomMemberRequest {
     uint32 block_kick_flag  = 4;
 }
 
+// Command replies
+
 message CreateRoomReply {
     uint64 room_id    = 1;
     uint32 server_id  = 2;
@@ -344,13 +358,32 @@ message JoinRoomReply {
     CreateJoinRoomResponse details = 6;
 }
 
-message GetRoomListReply             { repeated MatchingRoomDataExternal rooms = 1; }
-message RequestSignalingInfosReply   { string target_npid = 1; string target_ip = 2; uint32 target_port = 3; uint32 target_member_id = 4; }
-message LeaveRoomReply               { uint64 room_id = 1; }
-message SetRoomDataInternalReply     { uint64 room_id = 1; }
-message SetRoomDataExternalReply     { uint64 room_id = 1; }
-message KickoutRoomMemberReply       { uint64 room_id = 1; }
+message GetRoomListReply {
+    repeated MatchingRoomDataExternal rooms = 1;
+}
 
+message RequestSignalingInfosReply {
+    string target_npid      = 1;
+    string target_ip        = 2;
+    uint32 target_port      = 3;
+    uint32 target_member_id = 4;
+}
+
+message LeaveRoomReply            { uint64 room_id = 1; }
+message SetRoomDataInternalReply  { uint64 room_id = 1; }
+message SetRoomDataExternalReply  { uint64 room_id = 1; }
+message KickoutRoomMemberReply    { uint64 room_id = 1; }
+
+
+message GetTokenReply {
+    string token = 1;
+    uint64 user_id = 2;
+    string npid = 3;
+}
+
+// Notification payloads
+
+// NotificationType::RequestEvent (9)
 message NotifyRequestEvent {
     uint32 ctx_id        = 1;
     uint32 server_id     = 2;
@@ -367,6 +400,7 @@ message NotifyRequestEvent {
     bytes  response_blob = 13;
 }
 
+// NotificationType::MemberJoined (10)
 message NotifyMemberJoined {
     uint64                   room_id   = 1;
     uint32                   member_id = 2;
@@ -376,14 +410,40 @@ message NotifyMemberJoined {
     repeated MatchingBinAttr bin_attrs = 6;
 }
 
-message NotifyMemberLeft         { uint64 room_id = 1; uint32 member_id = 2; string npid = 3; }
-message NotifySignalingHelper    { string npid = 1; uint32 member_id = 2; string addr = 3; uint32 port = 4; }
-message NotifySignalingEvent     { uint32 event_type = 1; uint64 room_id = 2; uint32 member_id = 3; uint32 conn_id = 4; }
+// NotificationType::MemberLeft (11)
+message NotifyMemberLeft {
+    uint64 room_id   = 1;
+    uint32 member_id = 2;
+    string npid      = 3;
+}
 
+// NotificationType::SignalingHelper (12)
+message NotifySignalingHelper {
+    string npid      = 1;
+    uint32 member_id = 2;
+    string addr      = 3;
+    uint32 port      = 4;
+}
+
+// NotificationType::SignalingEvent (13)
+message NotifySignalingEvent {
+    uint32 event_type = 1;
+    uint64 room_id    = 2;
+    uint32 member_id  = 3;
+    uint32 conn_id    = 4;
+}
+
+// NotificationType::RoomDataInternalUpdated (15)
 message NotifyRoomDataInternalUpdated {
     uint64                   room_id   = 1;
     uint32                   flags     = 2;
     repeated MatchingBinAttr bin_attrs = 3;
 }
 
-message NotifyKickedOut          { uint64 room_id = 1; int32 status_code = 2; uint32 guard_value = 3; }
+// NotificationType::KickedOut (16)
+message NotifyKickedOut {
+    uint64 room_id    = 1;
+    int32  status_code = 2;
+    uint32 guard_value = 3;
+}
+
