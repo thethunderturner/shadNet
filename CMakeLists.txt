@@ -5,6 +5,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
+# Build the executable with its install RPATH so installing doesn't require a
+# relink step. The Ninja generator refuses that relink on some platforms
+# ("requires changing an RPATH from the build tree ... not supported with the
+# Ninja generator"), which breaks even a plain build/configure.
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
 # === Runtime library: must match Qt6 which always uses DLL runtime ===
 if(MSVC)
     cmake_policy(SET CMP0091 NEW)
